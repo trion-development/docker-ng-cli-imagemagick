@@ -1,32 +1,31 @@
 FROM trion/ng-cli-e2e
 
-ENV MAGICK_URL "http://imagemagick.org/download/releases"
-ENV MAGICK_VERSION 6.9.1-10
+ENV MAGICK_URL "https://imagemagick.org/download/releases"
+ENV MAGICK_VERSION 6.9.10-44
 
 RUN gpg --keyserver pool.sks-keyservers.net --recv-keys 8277377A \
   && apt-get update -y \
   && apt-get install -y --no-install-recommends \
-    libpng-dev libjpeg-dev libtiff-dev libopenjpeg-dev \
+    libpng-dev libjpeg-dev libtiff-dev libopenjp2-7-dev \
   && apt-get remove -y imagemagick \
   && cd /tmp \
   && curl -SLO "${MAGICK_URL}/ImageMagick-${MAGICK_VERSION}.tar.xz" \
   && curl -SLO "${MAGICK_URL}/ImageMagick-${MAGICK_VERSION}.tar.xz.asc" \
   && gpg --verify "ImageMagick-${MAGICK_VERSION}.tar.xz.asc" "ImageMagick-${MAGICK_VERSION}.tar.xz" \
   && tar xf "ImageMagick-${MAGICK_VERSION}.tar.xz" \
-
 # http://www.imagemagick.org/script/advanced-unix-installation.php#configure
   && cd "ImageMagick-${MAGICK_VERSION}" \
   && ./configure \
     --disable-static \
     --enable-shared \
-
+#
     --with-jpeg \
     --with-jp2 \
     --with-openjp2 \
     --with-png \
     --with-tiff \
     --with-quantum-depth=8 \
-
+#
     --without-magick-plus-plus \
     # disable BZLIB support
     --without-bzlib \
@@ -64,11 +63,11 @@ RUN gpg --keyserver pool.sks-keyservers.net --recv-keys 8277377A \
     --without-x \
     # disable XML support
     --without-xml \
-
+#
   && make \
   && make install \
   && ldconfig /usr/local/lib \
-
+#
   && apt-get -y autoclean \
   && apt-get -y autoremove \
 && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
