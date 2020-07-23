@@ -3,11 +3,14 @@ FROM trion/ng-cli-e2e
 ENV MAGICK_URL "https://imagemagick.org/download/releases"
 ENV MAGICK_VERSION 6.9.10-44
 
-RUN gpg --keyserver pool.sks-keyservers.net --recv-keys 8277377A \
-  && apt-get update -y \
+RUN \
+  apt-get update -y \
   && apt-get install -y --no-install-recommends \
     libpng-dev libjpeg-dev libtiff-dev libopenjp2-7-dev \
+    gpg dirmngr \
   && apt-get remove -y imagemagick \
+  && mkdir -p ~/.gnupg && echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf \
+  && gpg --keyserver pool.sks-keyservers.net --recv-keys 8277377A \
   && cd /tmp \
   && curl -SLO "${MAGICK_URL}/ImageMagick-${MAGICK_VERSION}.tar.xz" \
   && curl -SLO "${MAGICK_URL}/ImageMagick-${MAGICK_VERSION}.tar.xz.asc" \
